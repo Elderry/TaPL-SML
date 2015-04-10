@@ -1,11 +1,9 @@
-structure HigherOrder: HIGHER_ORDER =
-struct
+structure HigherOrder: HIGHER_ORDER = struct
 
 datatype t
   = Num of int
   | Abs of t -> t
   | App of t * t
-       
 
 exception NoRule
 exception Todo
@@ -30,9 +28,6 @@ fun evalAll t =
          val _ = print "\n"
      in evalAll t'
      end) handle NoRule => t
-
-
-
 
 (* unit test *)
 val e = App (App (Abs (fn x =>

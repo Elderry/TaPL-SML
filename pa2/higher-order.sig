@@ -1,5 +1,4 @@
-signature HIGHER_ORDER =
-sig
+signature HIGHER_ORDER = sig
 
     datatype t
       = Num of int

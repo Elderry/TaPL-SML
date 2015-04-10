@@ -11,10 +11,6 @@ fun isValue t = case t of
     Abs (string, _) => true
     | _ => false
 
-fun getFreeVariables t = case t of
-	Var _ => [t]
-	| Abs (x, t1) => 
-
 (* generate fresh variables when called *)
 val counter = ref 0
 fun fresh () =
@@ -23,30 +19,35 @@ fun fresh () =
     in concat ["x_", Int.toString n]
     end
 
-fun alphaConversion t =
-    let fun doit (map, t) = case t of
-        Var x => Var (map x)
-        | Abs (x, e) => Abs (doit ( fn y => if x = y then "0" else concat ["x_", Int.toString ((map y) + 1)] , e))
-        | App (e1, e2) => App(doit (map, e1), doit (map, e2))
-    in  doit (fn _ => raise BadExpression, t)
-    end
+(* in t, substitute oldName with newName *)
+fun alpha (oldName:string, newName:string, t) = case t of
+	Var x => if x = oldName then Var newName else Var x
+	| Abs (y, t1) => if y = oldName
+		then Abs (newName, alpha (oldName, newName, t1))
+		else Abs (y, alpha (oldName, newName, t1))
+	| App (t1, t2) => App (alpha (oldName, newName, t1), alpha (oldName, newName, t2))
+
+(* in t12, substitute s with x *)
+fun substitute (x:string, s, t12) = case t12 of
+    Var y => if y = x then s else Var y
+    | Abs (y, t1) => let 
+    		val newName = fresh ()
+    		val t2 = alpha (y, newName, t1)
+    	in
+    		Abs (newName, substitute(x, s, t2))
+    	end
+    | App (t1, t2) => App (substitute(x, s, t1), substitute(x, s, t2))
 
 (* one-step evaluator *)
 fun eval t = case t of
-    Var _ => NoRule
-    | Abs (_, _) => NoRule
+    Var _ => raise NoRule
+    | Abs (_, _) => raise NoRule
     | App (Abs (x, t12), v2) => if isValue v2
-        then let val x = v2 in t12 end
-        else App (eval (Abs (x, t12)), v2)
+    	then substitute (x, v2, t12)
+    	else App (eval (Abs (x, t12)), v2)
     | App (v1, t2) => if isValue v1
-        then App (v1, eval t2)
-        else App (eval v1, t2) 
-
-fun replace (x:string, v2, t12) case v2 of
-    Var nv => case t12 of
-        Var s => if s = x then Var nv else Var s
-        | Abs (y, t1) => if (not y = x) andalso
-    | _ => raise NoRule
+    	then App (v1, eval t2)
+    	else raise NoRule 
 
 fun pp t =
     case t
@@ -74,5 +75,4 @@ val Omega = Lambda.App (omega, omega)
 
 val _ = (Lambda.pp Omega; print "\n")
 
-(*val _ = Lambda.evalAll Omega*)
-        
+val _ = (Lambda.pp (Lambda.eval Omega); print "\n")
