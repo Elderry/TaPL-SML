@@ -28,7 +28,7 @@ fun alpha (oldName:string, newName:string, t) = case t of
 	| App (t1, t2) => App (alpha (oldName, newName, t1), alpha (oldName, newName, t2))
 
 (* in t12, substitute s with x *)
-fun substitute (x:string, s, t12) = case t12 of
+fun substitute (x:string, s, t) = case t of
     Var y => if y = x then s else Var y
     | Abs (y, t1) => let 
     		val newName = fresh ()
@@ -40,14 +40,11 @@ fun substitute (x:string, s, t12) = case t12 of
 
 (* one-step evaluator *)
 fun eval t = case t of
-    Var _ => raise NoRule
-    | Abs (_, _) => raise NoRule
-    | App (Abs (x, t12), v2) => if isValue v2
-    	then substitute (x, v2, t12)
-    	else App (eval (Abs (x, t12)), v2)
-    | App (v1, t2) => if isValue v1
-    	then App (v1, eval t2)
-    	else raise NoRule 
+    App (Abs (x, t12), v2) => if isValue v2
+        then substitute (x, v2, t12)                (* E-APPABS *)
+        else App (Abs (x, t12), eval v2)            (* E-APP2 *)
+    | App (t1, t2) => App(eval t1, t2)              (* E-APP1 *)
+    | _ => raise NoRule
 
 fun pp t =
     case t

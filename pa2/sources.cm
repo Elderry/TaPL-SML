@@ -2,10 +2,10 @@ Group
         signature LAMBDA
         structure Lambda
 
-(*
         signature DEBRUIJN
         structure DeBruijn
 
+(*
         signature CLOSURE
         structure Closure
 
@@ -16,10 +16,10 @@ is
         lambda.sig
         lambda.sml
 
-(*
         de-bruijn.sig
         de-bruijn.sml
 
+(*
         closure.sig
         closure.sml
 
