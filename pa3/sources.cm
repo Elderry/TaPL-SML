@@ -1,0 +1,8 @@
+Group
+        signature TYPE
+        structure Type
+is
+        type.sig
+        type.sml
+
+        $/basis.cm
