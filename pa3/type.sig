@@ -1,5 +1,4 @@
-signature TYPE =
-sig
+signature TYPE = sig
 
     datatype ty
       = Bool

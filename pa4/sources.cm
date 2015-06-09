@@ -1,0 +1,8 @@
+Group
+    signature REFERENCE
+    structure Reference
+is
+    reference.sig
+    reference.sml
+
+    $/basis.cm

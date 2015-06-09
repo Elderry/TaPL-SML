@@ -1,8 +1,8 @@
 Group
-        signature ARITH
-        structure Arith
+    signature ARITH
+    structure Arith
 is
-        arith.sig
-        arith.sml
+    arith.sig
+    arith.sml
 
-        $/basis.cm
+    $/basis.cm
