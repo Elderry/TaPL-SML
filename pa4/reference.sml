@@ -126,7 +126,61 @@ structure Reference: REFERENCE = struct
     
 		end (* structure Heap *)
 
-	fun eval t = raise Todo
+	fun isValue t = case t of
+		True => true
+		| False => true
+		| App (_, _, _) => true
+		| Unit => true
+		| Address _ => true
+
+	fun substitute(x, v, t) = case x of
+		Var x1 => case t of
+	    	Var x2 =>
+	            if x2 = x1
+	            then v
+	            else Var x2
+	    	| Abs(y, t1) => Abs(y, substitute (x, v, t1))
+	    	| App(t1, t2) =>
+	            App(
+	                substitute (x, v, t1),
+	                substitute (x, v, t2))
+	        | Ref t1 => Ref substitute(x, v, t1)
+	        | Deref t1 => Deref substitute(x, v, t1)
+	        | Assign (t1, t2) =>
+		        Assign(
+		        	substitute(x, v, t1),
+		        	substitute(x, v, t2))
+		    | _ => t
+	    _ => raise NoRule
+
+	fun eval t = case t of
+		App (t1, t2) =>
+			if isValue t1
+			then case t1 of
+				Abs (x, ty1, t12) =>
+					if isValue t2
+					then substitute(x, t2, t12) (* E-APPABS *)
+					else App(t1, eval t2) (* E-APP2 *)
+				| _ => App (t1, eval t2) (* E-APP2 *)
+			else (eval t1, t2) (* E-APP1 *)
+		| Ref t1 =>
+			if isValue t1
+			then
+				(Heap.lookup(t1))
+				handle BadAddress => Heap.alloc(t1) (* E-REFV *)
+			else Ref eval t1 (* E-REF *)
+		| Deref t1 => case t1 of
+			Address l => Heap.lookup(l) (* E-DEREFLOC *)
+			| _ => Deref (eval t1) (* E-DEREF *)
+		| Assign (t1, t2) =>
+			if isValue t1
+			then
+				if isValue t2
+				then case t1 of
+					Address l => Heap.update(l, t2) (* E-ASSIGN *)
+					| _ => raise NoRule
+				else Assign(t1, eval t2) () (* E-ASSIGN2 *)
+			else Assign(eval t1, t2) (* E-ASSIGN1 *)
 
 	fun pp t = case t of
 	    Ref t => (print "ref "; pp t)
@@ -134,7 +188,20 @@ structure Reference: REFERENCE = struct
 	    | Assign (t1, t2) => (pp t1; print " := "; pp t2)
 	    | Address x => print x
 	    | Unit => print "()"
-	    | _ => raise Todo
+	    | Var x => print x
+        | Abs(x, e) => 
+            (print "\\lambda ";
+                print x;
+                print ".(";
+                pp e;
+                print ")")
+        | App(e1, e2) =>
+            (print "(";
+                pp e1;
+                print ") ";
+                print "(";
+                pp e2;
+                print ")")
 
 	fun evalAll t =
 	    (let val t' = (eval t)
