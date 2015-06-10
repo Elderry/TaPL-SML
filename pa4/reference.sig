@@ -1,6 +1,6 @@
 signature REFERENCE = sig
 
-    structure Type: sig
+    structure Type:sig
   		datatype t
     		= Bool
             | Unit

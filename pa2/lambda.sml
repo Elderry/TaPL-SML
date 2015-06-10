@@ -1,6 +1,6 @@
 structure Lambda:LAMBDA = struct
 
-    datatype t 
+    datatype t
         = Var of string
         | Abs of string * t
         | App of t * t
@@ -40,8 +40,7 @@ structure Lambda:LAMBDA = struct
         | Abs (y, t1) =>
             let val newName = fresh()
         		val t2 = alpha(y, newName, t1)
-        	in
-        		Abs(newName, substitute(x, s, t2))
+        	in Abs(newName, substitute(x, s, t2))
         	end
         | App(t1, t2) => App(substitute(x, s, t1), substitute(x, s, t2))
 
