@@ -1,0 +1,8 @@
+Group
+    signature SUBTYPE
+    structure Subtype
+is
+    subtype.sig
+    subtype.sml
+
+    $/basis.cm
