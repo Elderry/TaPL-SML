@@ -1,8 +1,8 @@
 signature SUBTYPE = sig
 
-    structure Type: sig
+    structure Type:sig
         datatype t =
-            Record of (string*t) list
+            Record of (string * t) list
             | Top
             | String
             | Arrow of t * t

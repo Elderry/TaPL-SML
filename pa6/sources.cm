@@ -4,5 +4,5 @@ Group
 is
     subtype.sig
     subtype.sml
-
+    
     $/basis.cm
