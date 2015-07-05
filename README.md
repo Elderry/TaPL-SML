@@ -6,7 +6,17 @@ To run codes in this project, you need compiler Standard ML of New Jersey(abbrev
 
 ## Running (Windows)
 After conforming SML/NJ is installed and system path is correctly configured. Launch SML/NJ at the corresponding directory, and then input:
-`CM.make "soureces.cm";`
+```
+CM.make "soureces.cm";
+```
+
+## Contents
+1. Arithmetic Expressions at Chapter 3
+2. Lambda Calculus at Chapter 5
+3. Simple Types at Chapter 9
+4. References at Chapter 13
+5. Exceptions at Chapter 14
+6. Subtyping at Chapter 15
 
 ## About
 Any problems about this project, feel free to contact:
