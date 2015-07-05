@@ -1,2 +1,13 @@
-# formal-methods-sml
-This project is the homework of Formal Methods Foundation of USTC.
+# TAPL-SML
+This project contains companying code for book "Types and Programming Languages", in Standard ML.
+
+## Environment
+To run codes in this project, you need compiler Standard ML of New Jersey(abbreviated SML/NJ), which can be downloaded [here](http://www.smlnj.org/dist/working/index.html). All codes are tested under version 110.77.
+
+## Running (Windows)
+After conforming SML/NJ is installed and system path is correctly configured. Launch SML/NJ at the corresponding directory, and then input:
+`CM.make "soureces.cm";`
+
+## About
+Any problems about this project, feel free to contact:
+Elderry@outlook.com
