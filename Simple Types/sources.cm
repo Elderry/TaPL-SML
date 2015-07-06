@@ -1,8 +1,8 @@
 Group
-        signature TYPE
-        structure Type
+    signature TYPE
+    structure Type
 is
-        type.sig
-        type.sml
+    type.sig
+    type.sml
 
-        $/basis.cm
+    $/basis.cm

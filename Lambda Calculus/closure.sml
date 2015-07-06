@@ -1,7 +1,7 @@
 structure Closure:CLOSURE = struct
 
-    datatype t
-        = Num of int
+    datatype t =
+    	Num of int
         | Var of string
         | Abs of string * t
         | App of t * t

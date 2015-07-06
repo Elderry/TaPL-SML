@@ -14,12 +14,12 @@ structure Type = struct
 
 	exception TypeError
        
-	fun tyEquals (ty1, ty2) = case (ty1, ty2) of
+	fun tyEquals(ty1, ty2) = case (ty1, ty2) of
 		(Bool, Bool) => true
 		| (Fun(s1, s2), Fun(s3, s4)) => tyEquals(s1, s3) andalso tyEquals(s2, s4)
 		| _ => false
 	        
-	fun check(env, t): ty = case t of
+	fun check(env, t):ty = case t of
 		True => Bool
 		| False => Bool
 		| If (t1, t2, t3) => (case check(env, t1) of
@@ -46,8 +46,7 @@ structure Type = struct
 
 	fun typeCheck t = check(fn x => raise TypeError, t)
 
-	val e = App (Abs ("x", Fun (Bool, Bool), Var "x")
-	           , (Abs ("x", Bool, Var "x")))
+	val e = App(Abs("x", Fun(Bool, Bool), Var "x") , (Abs("x", Bool, Var "x")))
 
 	val _ = typeCheck e
 
