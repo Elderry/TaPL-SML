@@ -1,7 +1,7 @@
 structure Lambda:LAMBDA = struct
 
-    datatype t
-        = Var of string
+    datatype t =
+        Var of string
         | Abs of string * t
         | App of t * t
 
@@ -27,17 +27,17 @@ structure Lambda:LAMBDA = struct
             else Var x
     	| Abs (y, t1) =>
             if y = oldName
-    		then Abs (newName, alpha(oldName, newName, t1))
-    		else Abs (y, alpha (oldName, newName, t1))
+    		then Abs(newName, alpha(oldName, newName, t1))
+    		else Abs(y, alpha (oldName, newName, t1))
     	| App (t1, t2) =>
             App(
-                alpha (oldName, newName, t1),
-                alpha (oldName, newName, t2))
+                alpha(oldName, newName, t1),
+                alpha(oldName, newName, t2))
 
     (* in t12, substitute s with x *)
-    fun substitute(x:string, s, t) = case t of
+    fun substitute(x, s, t) = case t of
         Var y => if y = x then s else Var y
-        | Abs (y, t1) =>
+        | Abs(y, t1) =>
             let val newName = fresh()
         		val t2 = alpha(y, newName, t1)
         	in Abs(newName, substitute(x, s, t2))
@@ -46,10 +46,11 @@ structure Lambda:LAMBDA = struct
 
     (* one-step evaluator *)
     fun eval t = case t of
-        App (Abs (x, t12), v2) => if isValue v2
-            then substitute (x, v2, t12)                (* E-APPABS *)
-            else App (Abs (x, t12), eval v2)            (* E-APP2 *)
-        | App (t1, t2) => App(eval t1, t2)              (* E-APP1 *)
+        App(Abs(x, t12), v2) =>
+            if isValue v2
+            then substitute(x, v2, t12) (* E-APPABS *)
+            else App(Abs(x, t12), eval v2) (* E-APP2 *)
+        | App(t1, t2) => App(eval t1, t2) (* E-APP1 *)
         | _ => raise NoRule
 
     fun pp t = case t of
@@ -68,8 +69,8 @@ structure Lambda:LAMBDA = struct
                 pp e2;
                 print ")")
 
-    fun evalAll t =
-        (let val t' = (eval t)
+    fun evalAll t = (
+        let val t' = (eval t)
             val _ = pp t'
             val _ = print "\n"
         in evalAll t'
@@ -78,9 +79,9 @@ structure Lambda:LAMBDA = struct
 end (* structure Lambda *)
 
 (* a unit test *)
-val omega = Lambda.Abs ("x", (Lambda.App (Lambda.Var "x", Lambda.Var "x")))
+val omega = Lambda.Abs("x", (Lambda.App(Lambda.Var "x", Lambda.Var "x")))
 
-val Omega = Lambda.App (omega, omega)
+val Omega = Lambda.App(omega, omega)
 
 val _ = (Lambda.pp Omega; print "\n")
 

@@ -13,10 +13,10 @@ signature DEBRUIJN = sig
  * De Bruijn representation.
  *)
 
-    datatype t 
-      = Var of int
-      | Abs of t
-      | App of t * t
+    datatype t =
+    	Var of int
+    	| Abs of t
+    	| App of t * t
 
     val eval: t -> t
     val evalAll: t -> t

@@ -86,13 +86,15 @@ structure Arith:ARITH = struct
                         else raise Error
         			| _ => raise Error)
     		| Succ t =>
-                let val nv = evalBig t in
+                let val nv = evalBig t
+                in
                     if isNumber(evalBig nv)
                     then Succ nv
                     else raise Error
                 end (* B-SUCC *)
     		| Pred t =>
-                let val t' = evalBig t in
+                let val t' = evalBig t
+                in
                     if t' = Zero
                     then Zero (* B-PREDZERO *)
                     else
@@ -104,7 +106,8 @@ structure Arith:ARITH = struct
                             | _ => raise Error (* B-PREDSUCC *)
                 end
     		| IsZero t =>
-                let val t' = evalBig t in
+                let val t' = evalBig t
+                in
                     if t' = Zero
                     then True (* B-ISZEROZERO *)
                     else
