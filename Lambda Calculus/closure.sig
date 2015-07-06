@@ -1,5 +1,4 @@
-signature CLOSURE =
-sig
+signature CLOSURE = sig
 
     datatype t
       = Num of int
@@ -17,4 +16,5 @@ sig
     val eval: env * t -> env * t
     val evalAll: env * t -> env * t
     val pp: t -> unit
+
 end
