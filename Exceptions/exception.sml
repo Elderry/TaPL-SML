@@ -112,20 +112,20 @@ structure Exception: EXCEPTION = struct
 	val ty = typeCheck t
 	val t' = evalAll t
 	val _ = (print "Type: "; print (Type.toString(ty)); print "\n")
-	val _ = (print "After evaluation: "; pp t'; print "\n")
+	val _ = (print "After evaluation: "; pp t'; print "\n\n")
 
 	val t = Try (Try (Throw, Num 3), Num 5)
 	val _ = (print "case 2: "; pp t; print "\n")
 	val ty = typeCheck t
 	val t' = evalAll t
 	val _ = (print "Type: "; print (Type.toString(ty)); print "\n")
-	val _ = (print "After evaluation: "; pp t'; print "\n")
+	val _ = (print "After evaluation: "; pp t'; print "\n\n")
 
 	val t = Throw
 	val _ = (print "case 3: "; pp t; print "\n")
 	val ty = typeCheck t
 	val t' = evalAll t
 	val _ = (print "Type: "; print (Type.toString(ty)); print "\n")
-	val _ = (print "After evaluation: "; pp t'; print "\n")
+	val _ = (print "After evaluation: "; pp t'; print "\n\n")
 
 end

@@ -1,0 +1,8 @@
+Group
+        signature LAMBDA
+        structure Lambda
+is
+        lambda.sig
+        lambda.sml
+
+        $/basis.cm

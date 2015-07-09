@@ -1,0 +1,8 @@
+Group
+    signature SYSTEMF
+    structure SystemF
+is
+    system-f.sig
+    system-f.sml
+
+    $/basis.cm
