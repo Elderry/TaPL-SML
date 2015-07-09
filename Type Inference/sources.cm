@@ -1,8 +1,8 @@
 Group
-        signature LAMBDA
-        structure Lambda
+    signature LAMBDA
+    structure Lambda
 is
-        lambda.sig
-        lambda.sml
+    lambda.sig
+    lambda.sml
 
-        $/basis.cm
+    $/basis.cm
