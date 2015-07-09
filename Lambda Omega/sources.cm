@@ -1,8 +1,8 @@
 Group
-        signature LAMBDA_OMEGA
-        structure LambdaOmega
+    signature LAMBDA_OMEGA
+    structure LambdaOmega
 is
-        lambda-omega.sig
-        lambda-omega.sml
+    lambda-omega.sig
+    lambda-omega.sml
 
-        $/basis.cm
+    $/basis.cm

@@ -111,7 +111,7 @@ structure LambdaOmega:LAMBDA_OMEGA = struct
             then true
             else false
         | (Con.Var X, Con.Var Y) => if X = Y then true else false
-        | (Con.App(Con.Var X, c1'), Con.App(Con.Var Y, c2')) => (
+        | (Con.TyApp(Con.Var X, c1'), Con.TyApp(Con.Var Y, c2')) => (
             case kindCheck(D, Con.Var X) of
                 Kind.KArrow(K, Kind.Star) =>
                     if algEq(D, c1', c2', K)
@@ -121,7 +121,18 @@ structure LambdaOmega:LAMBDA_OMEGA = struct
         | _ => false
 
     (* algorithmic equivalence*)
-    and algEq(D: string -> Kind.t, c1, c2, k):bool =
+    and algEq(D: string -> Kind.t, c1, c2, k):bool = case k of
+        Kind.Star =>
+            let val c1' = evalCon(D, c1)
+                val c2' = evalCon(D, c2)
+            in strEq(D, c1', c2')
+            end
+        | Kind.KArrow(K1, K2) =>
+            algEq(
+                fn x => if x = "a" then K1 else D x,
+                Con.TyApp(c1, Con.Var "a"),
+                Con.TyApp(c2, Con.Var "a"),
+                K2)
           
     (* \beta-normalization *)
     and evalCon(D: string -> Kind.t, c) = case c of
@@ -135,7 +146,8 @@ structure LambdaOmega:LAMBDA_OMEGA = struct
 
     (* kind checking *)
     and kindCheck(D: string -> Kind.t, c):Kind.t = case c of
-        Con.Var X => D X
+        Con.Bool => Kind.Star
+        | Con.Var X => D X
         | Con.TyAbs(X, K, T) =>
             kindCheck(
                 fn L => if L = X then K else D L,
@@ -151,7 +163,8 @@ structure LambdaOmega:LAMBDA_OMEGA = struct
                 | _ => raise TypeError ""
             end
         | Con.Arrow(T1, T2) =>
-            if Kind.equals(T1, Kind.Star) andalso Kind.equals(T2, Kind.Star)
+            if Kind.equals(kindCheck(D, T1), Kind.Star)
+                andalso Kind.equals(kindCheck(D, T2), Kind.Star)
             then Kind.Star
             else raise TypeError ""
 
@@ -159,16 +172,31 @@ structure LambdaOmega:LAMBDA_OMEGA = struct
     fun check(G: string -> Con.t, D: string -> Kind.t, t):Con.t = case t of
         True => Con.Bool
         | False => Con.Bool
-        | If(t1, t2, t3) => (case check(G, D, t1) of
-            Type.Bool =>
-                let val ty2 = check(G, D, t2)
-                    val ty3 = check(G, D, t3)
-                in if Type.equals(ty2, ty3)
-                    then ty2
+        | If(t1, t2, t3) => (case evalCon(D, check(G, D, t1)) of
+            Con.Bool =>
+                let val c1 = check(G, D, t2)
+                    val c2 = check(G, D, t3)
+                in if algEq(D, c1, c2, Kind.Star)
+                    then c1
                     else raise TypeError ""
                 end
             | _ => raise TypeError "") (* T-IF *)
-        | Var x => if D x then Type.Var x else G x
+        | Var x => G x
+        | Abs(x, c, t) =>
+            if Kind.equals(kindCheck(D, c), Kind.Star)
+            then
+                Con.Arrow(
+                    c,
+                    check(fn y => if y = x then c else G y, D, t))
+            else raise TypeError ""
+        | App(t1, t2) => (case evalCon(D, check(G, D, t1)) of
+            Con.Arrow(c2, c3) =>
+                let val c4 = check(G, D, t2)
+                in if algEq(D, c2, c4, Kind.Star)
+                    then c3
+                    else raise TypeError ""
+                end
+            | _ => raise TypeError "")
 
     fun typeCheck t = 
         check(
