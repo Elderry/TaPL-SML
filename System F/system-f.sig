@@ -1,11 +1,5 @@
 signature SYSTEMF = sig
 
-    (* T -> Bool
-     *    | X
-     *    | T -> T
-     *    | Forall X.T
-     *    | Exists X.T
-     *)
     structure Type:sig
 
         datatype t =
@@ -21,21 +15,6 @@ signature SYSTEMF = sig
 
     end
 
-    (* e -> true
-     *    | false
-     *    | if (e, e, e)
-     *    | x
-     *    | lambda x:T.e
-     *    | e e
-     *    | (e, e)
-     *    | #1 e
-     *    | #2 e
-     *    | TyLambda X.e
-     *    | e [T]
-     *    | pack {T, e} as T'
-     *    | unpack {X, x}=e1 in e2
-     *)
-              
     datatype t =
         True
         | False
