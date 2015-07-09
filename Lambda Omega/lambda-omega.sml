@@ -15,9 +15,9 @@ structure LambdaOmega:LAMBDA_OMEGA = struct
                 pp t2;
                 print ")")
 
-        fun equals (k1, k2) = case (k1, k2) of
+        fun equals(k1, k2) = case (k1, k2) of
             (Star, Star) => true
-            | (KArrow (s1, s2), KArrow (s3, s4)) => equals(s1, s3) andalso equals(s2, s4)
+            | (KArrow(s1, s2), KArrow(s3, s4)) => equals(s1, s3) andalso equals(s2, s4)
             | _ => false
         
     end (* structure Kind *)
@@ -61,30 +61,30 @@ structure LambdaOmega:LAMBDA_OMEGA = struct
             in String.concat ["X_", Int.toString n]
             end
     
-        fun alpha (t) =
-            let fun doit (G, t) = case t of
+        fun alpha t =
+            let fun doit(G, t) = case t of
                 Bool => Bool
                 | Var x => Var (G x)
-                | Arrow (t1, t2) => Arrow (doit (G, t1), doit(G, t2))
-                | TyAbs (X, K, t) =>
-                    let val new = fresh ()
-                    in TyAbs (
+                | Arrow(t1, t2) => Arrow(doit(G, t1), doit(G, t2))
+                | TyAbs(X, K, t) =>
+                    let val new = fresh()
+                    in TyAbs(
                         new,
                         K,
                         doit(fn z => if z = X then new else G z, t))
                     end
-                | TyApp (t1, t2) => TyApp(doit(G, t1), doit(G, t2))
+                | TyApp(t1, t2) => TyApp(doit(G, t1), doit(G, t2))
             in doit(fn x => x, t)
             end
     
         (* [x|->t1]t2 *)
-        fun subst (x, t1, t2) = case t2 of
+        fun subst(x, t1, t2) = case t2 of
             Bool => Bool
             | Var y => if x=y then t1 else t2
-            | Arrow (s1, s2) => Arrow(subst(x, t1, s1), subst(x, t1, s2))
-            | TyAbs (X, K, t') =>
+            | Arrow(s1, s2) => Arrow(subst(x, t1, s1), subst(x, t1, s2))
+            | TyAbs(X, K, t') =>
                 let val (Y, t2') =
-                    case alpha (t2) of
+                    case alpha t2 of
                         TyAbs (Y, _, t'') => (Y, t'')
                         | _ => raise Fail "bug"
                 in TyAbs (Y, K, subst(x, t1, t2'))
@@ -92,7 +92,6 @@ structure LambdaOmega:LAMBDA_OMEGA = struct
             | TyApp(s1, s2) => TyApp(subst(x, t1, s1), subst(x, t1, s2))
              
     end (* structure Con *)
-
 
     datatype t =
         True
@@ -105,15 +104,29 @@ structure LambdaOmega:LAMBDA_OMEGA = struct
     exception TypeError of string
 
     (* structural equivalence *)
-    fun strEq (D: string -> Kind.t, c1, c2): bool =
-          
+    fun strEq(D: string -> Kind.t, c1, c2):bool = case (c1, c2) of
+        (Con.Bool, Con.Bool) => true
+        | (Con.Arrow(c11, c12), Con.Arrow(c21, c22)) =>
+            if algEq(D, c11, c21, Kind.Star) andalso algEq(D, c12, c22, Kind.Star)
+            then true
+            else false
+        | (Con.Var X, Con.Var Y) => if X = Y then true else false
+        | (Con.App(Con.Var X, c1'), Con.App(Con.Var Y, c2')) => (
+            case kindCheck(D, Con.Var X) of
+                Kind.KArrow(K, Kind.Star) =>
+                    if algEq(D, c1', c2', K)
+                    then true
+                    else false
+                | _ => false)
+        | _ => false
+
     (* algorithmic equivalence*)
-    and algEq (D: string->Kind.t, c1, c2, k): bool =
+    and algEq(D: string -> Kind.t, c1, c2, k):bool =
           
     (* \beta-normalization *)
-    and evalCon (D: string ->Kind.t, c) = case c of
-        Con.TyApp (c1, c2) =>
-            let val c1' = evalCon (D, c1)
+    and evalCon(D: string -> Kind.t, c) = case c of
+        Con.TyApp(c1, c2) =>
+            let val c1' = evalCon(D, c1)
             in case c1' of
                 Con.TyAbs(X, k, cbody) => evalCon(D, Con.subst(X, c2, cbody))
                 | _ => Con.TyApp(c1', c2)
@@ -121,10 +134,41 @@ structure LambdaOmega:LAMBDA_OMEGA = struct
         | _ => c
 
     (* kind checking *)
-    fun kindCheck(D: string -> Kind.t, c):Kind.t =
-                  
+    and kindCheck(D: string -> Kind.t, c):Kind.t = case c of
+        Con.Var X => D X
+        | Con.TyAbs(X, K, T) =>
+            kindCheck(
+                fn L => if L = X then K else D L,
+                T)
+        | Con.TyApp(T1, T2) =>
+            let val K1 = kindCheck(D, T1)
+                val K2 = kindCheck(D, T2)
+            in case K1 of
+                Kind.KArrow(K11, K12) =>
+                    if Kind.equals(K2, K11)
+                    then K12
+                    else raise TypeError ""
+                | _ => raise TypeError ""
+            end
+        | Con.Arrow(T1, T2) =>
+            if Kind.equals(T1, Kind.Star) andalso Kind.equals(T2, Kind.Star)
+            then Kind.Star
+            else raise TypeError ""
+
     (* type checking *)
-    fun check(G: string -> Con.t, D: string -> Kind.t, t):Con.t = 
+    fun check(G: string -> Con.t, D: string -> Kind.t, t):Con.t = case t of
+        True => Con.Bool
+        | False => Con.Bool
+        | If(t1, t2, t3) => (case check(G, D, t1) of
+            Type.Bool =>
+                let val ty2 = check(G, D, t2)
+                    val ty3 = check(G, D, t3)
+                in if Type.equals(ty2, ty3)
+                    then ty2
+                    else raise TypeError ""
+                end
+            | _ => raise TypeError "") (* T-IF *)
+        | Var x => if D x then Type.Var x else G x
 
     fun typeCheck t = 
         check(

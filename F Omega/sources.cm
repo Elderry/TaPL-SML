@@ -1,0 +1,8 @@
+Group
+        signature F_OMEGA
+        structure FOmega
+is
+        f-omega.sig
+        f-omega.sml
+
+        $/basis.cm

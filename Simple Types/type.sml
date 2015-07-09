@@ -32,8 +32,13 @@ structure Type = struct
 				end
 			| _ => raise TypeError) (* T-IF *)
 		| Var x => env x (* T-VAR *)
-		| Abs (x, ty, t) => check(fn y => if x = y then ty else env y, t) (* T-ABS *)
-		| App (t1, t2) =>
+		| Abs(x, T, t) =>
+			Fun(
+				T,
+				check(
+					fn y => if y = x then T else env y,
+					t)) (* T-ABS *)
+		| App(t1, t2) =>
 			let val ty1 = check(env, t1)
 				val ty2 = check(env, t2)
 			in case ty1 of
@@ -48,6 +53,6 @@ structure Type = struct
 
 	val e = App(Abs("x", Fun(Bool, Bool), Var "x") , (Abs("x", Bool, Var "x")))
 
-	val _ = typeCheck e
+	val ty = typeCheck e
 
 end
