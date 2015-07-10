@@ -17,8 +17,10 @@ CM.make "sources.cm";
 4. References at Chapter 13
 5. Exceptions at Chapter 14
 6. Subtyping at Chapter 15
-7. Type Inference at Chapter 22 (Not Finished)
+7. Type Inference at Chapter 22
 8. System F at Chapter 23
+9. Lambda Omega at Chapter 29
+10. F Omega at Chapter 30
 
 ## About
 Any problems about this project, feel free to contact:
