@@ -21,7 +21,7 @@ structure Subtype:SUBTYPE = struct
             | Arrow(T1, T2) => (
                 case t1 of
                     Arrow(S1, S2) =>
-                        if isSub(T1, S1) andalso isSub(S2, T1)
+                        if isSub(T1, S1) andalso isSub(S2, T2)
                         then true
                         else false
                     | _ => false) (* S-ARROW *)
