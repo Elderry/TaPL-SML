@@ -78,7 +78,7 @@ structure Let:LET = struct
 		    		Type.subst (x, ty, s2)))
 		    t
 
-		fun solve(t) = raise Todo
+		fun solve t = raise Todo
 
 		fun pp t =
 			List.app(
@@ -110,7 +110,7 @@ structure Let:LET = struct
 	    in  String.concat ["X_", Int.toString n]
 	    end
 
-	fun instantiate (Type.Forall (vars, t)) =
+	fun instantiate(Type.Forall(vars, t)) =
 	    let fun doit(vars, t) = case vars of
 	    	[] => t
             | x::xs =>
@@ -188,18 +188,18 @@ structure Let:LET = struct
 	val t = App(Abs("x", Var "x"), True)
 	val ty = typeCheck t
 
-	val t1 = Let ("f", Abs("x", Var "x"), App (Var "f", Var "f"))
+	val t1 = Let("f", Abs("x", Var "x"), App(Var "f", Var "f"))
 	val ty1 = typeCheck t1
 
 	val t2 = Let(
 		"f0",
-		Abs("x0", Pair (Var "x0", Var "x0")),
+		Abs("x0", Pair(Var "x0", Var "x0")),
 		Let(
 			"f1",
 			Abs(
 				"x1",
 				App(Var "f0", App(Var "f0", Var "x1"))),
-			App(Var "f1", Abs ("z", Var "z"))))
+			App(Var "f1", Abs("z", Var "z"))))
 	val ty2 = typeCheck t2
 	(*
 	val t2 = Abs ("f", App (Var "f", Var "f"))
